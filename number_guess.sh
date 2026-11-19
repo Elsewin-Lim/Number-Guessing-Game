@@ -41,3 +41,17 @@ while true
       break
     fi
 done
+
+if [[ -z $USER_INFO ]]
+then
+  INSERT_RESULT=$($PSQL "INSERT INTO users(username, games_played, best_game) VALUES('$USERNAME', 1, $GUESS_COUNT);")
+else
+  (( GAMES_PLAYED++ ))
+
+  if [[ $GUESS_COUNT -lt $BEST_GAME ]]
+  then
+    BEST_GAME=$GUESS_COUNT
+  fi
+
+  UPDATE_RESULT=$($PSQL "UPDATE users SET games_played = $GAMES_PLAYED, best_game = $BEST_GAME WHERE username = '$USERNAME';")
+fi
