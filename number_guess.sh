@@ -1,17 +1,17 @@
 #!/bin/bash
 
-PSQL="psql --username=freecodecamp --dbname=postgres -t --no-align -c"
+PSQL="psql --username=freecodecamp --dbname=number_guess -t --no-align -c"
 
 echo "Enter your username: "
 read -r NAME
 
-USER=$($PSQL "SELECT * FROM users WHERE username = $NAME")
-IFS='|' read -r USER_ID USERNAME GAMES_PLAYED BEST_GAME <<< $USER 
-if [ -z $USER ]
+USER=$($PSQL "SELECT * FROM users WHERE username = '$NAME'")
+IFS='|' read -r USER_ID USERNAME GAME_PLAYED BEST_GAME <<< "$USER" 
+if [[ -z $USER ]]
 then 
-  echo -e "\nWelcome, $NAME! It look like this is your first time here.\n"
+  echo -e "Welcome, $NAME! It looks like this is your first time here."
 else
-  echo -e "\nWelcome back, $USERNAME! You have played $GAMEPLAYED games, and your best game took $BEST_GAME guesses.\n"
+  echo -e "Welcome back, $USERNAME! You have played $GAME_PLAYED games, and your best game took $BEST_GAME guesses."
 fi
 
 TARGET=$(( RANDOM % 1000 + 1 ))
@@ -42,9 +42,9 @@ while true
     fi
 done
 
-if [[ -z $USER_INFO ]]
+if [[ -z $USER ]]
 then
-  INSERT_RESULT=$($PSQL "INSERT INTO users(username, games_played, best_game) VALUES('$USERNAME', 1, $GUESS_COUNT);")
+  INSERT_RESULT=$($PSQL "INSERT INTO users(username, games_played, best_game) VALUES('$NAME', 1, $GUESS_COUNT);")
 else
   (( GAMES_PLAYED++ ))
 
@@ -53,5 +53,5 @@ else
     BEST_GAME=$GUESS_COUNT
   fi
 
-  UPDATE_RESULT=$($PSQL "UPDATE users SET games_played = $GAMES_PLAYED, best_game = $BEST_GAME WHERE username = '$USERNAME';")
+  UPDATE_RESULT=$($PSQL "UPDATE users SET games_played = $GAMES_PLAYED, best_game = $BEST_GAME WHERE username = '$NAME';")
 fi
